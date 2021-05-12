@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jumper</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <script src="js/bundle.js" defer></script>
+  </head>
+  <body>
+    <div class="start-screen">
+      <h1 class="title">Jumper</h1>
+      <div class="input-wrapper">
+        <input type="text" id="name" placeholder="Name" />
+        <button id="startBtn">Play!</button>
+      </div>
+      <div class="input-wrapper" id="connect">
+        <input type="text" id="address" placeholder="Address" />
+        <button id="connectBtn">Connect</button>
+      </div>
+      <div class="leaderboard">
+        <div class="left">
+          <h4>Last Score:</h4>
+          <span id="lScore"></span>
+          <h4>High Score:</h4>
+          <span id="hScore"></span>
+        </div>
+        <div class="right">
+          <h4>Leaderboard</h4>
+          <ol class="leaderboard-list"></ol>
+        </div>
+      </div>
+      <footer class="footer">
+        <p>
+          Created by
+          <a target="_blank" href="https://github.com/Jwiggiff"
+            >Josh Friedman (@Jwiggiff)</a
+          >
+        </p>
+        <p>
+          Backgrounds from
+          <a target="_blank" href="https://svgbackgrounds.com"
+            >SVGBackgrounds.com</a
+          >
+        </p>
+      </footer>
+    </div>
+
+    <div class="scoreboard">
+      <h4>Scoreboard</h4>
+      <ol class="scoreboard-list"></ol>
+      <div class="score">
+        <span id="playerName"></span>:
+        <span id="score"></span>
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="game-canvas"></canvas>
+    </div>
+  </body>
+</html>
