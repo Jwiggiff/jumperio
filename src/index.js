@@ -6,17 +6,18 @@ const RIGHT_KEYS = ["ArrowRight", "d"];
 
 export const startScreen = document.querySelector(".start-screen");
 export const scoreboard = document.querySelector(".scoreboard");
-const connectEl = document.getElementById("connect");
-const leaderboardEl = document.querySelector(".leaderboard");
+// const connectEl = document.getElementById("connect");
+// const leaderboardEl = document.querySelector(".leaderboard");
 
 setup();
-document.getElementById("connectBtn").addEventListener("click", () => {
-  if (document.getElementById("address").value.length != 0) {
-    connectEl.style.display = "none";
-    leaderboardEl.style.display = "flex";
-    connect(document.getElementById("address").value);
-  }
-});
+connect();
+// document.getElementById("connectBtn").addEventListener("click", () => {
+//   if (document.getElementById("address").value.length != 0) {
+//     connectEl.style.display = "none";
+//     leaderboardEl.style.display = "flex";
+//     connect(document.getElementById("address").value);
+//   }
+// });
 document.getElementById("startBtn").addEventListener("click", () => {
   if (document.getElementById("name").value.length != 0) {
     startScreen.style.display = "none";

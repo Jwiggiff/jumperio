@@ -107,7 +107,7 @@ button:active {
 }
 
 .leaderboard {
-  display: none;
+  display: flex;
   margin: 0 auto;
   border-radius: 0 5px 5px 0;
   background-color: #222;
