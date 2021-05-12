@@ -1,16 +1,14 @@
 const express = require("express");
-const fs = require("fs");
 const http = require("http");
 const socket = require("socket.io");
-
-// const { getLeaderboard, addScore } = require("./utils.js");
+const { Datastore } = require("@google-cloud/datastore");
 
 const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 
-let leaderboard;
+const datastore = new Datastore();
 
 let game1 = {
   id: "",
@@ -59,7 +57,10 @@ io.on("connection", (socket) => {
   // console.log(`A user just connected with id ${socket.id}.`);
 
   socket.emit("seed", game1.seed);
-  socket.emit("leaderboard", leaderboard.slice(0, 10));
+  getLeaderboard().then((leaderboard) =>
+    socket.emit("leaderboard", leaderboard)
+  );
+  // socket.emit("leaderboard", leaderboard.slice(0, 10));
 
   socket.on("disconnect", () => {
     // console.log(`A user has disconnected with id ${socket.id}.`);
@@ -100,50 +101,41 @@ io.on("connection", (socket) => {
       typeof game1.players[socket.id] !== "undefined" &&
       typeof game1.players[socket.id].score !== "undefined"
     )
-      addScore(game1.players[socket.id].name, game1.players[socket.id].score);
-    // .then(() => {
-    //   getLeaderboard();
-    // });
+      addScore(
+        game1.players[socket.id].name,
+        game1.players[socket.id].score
+      ).then(() => {
+        getLeaderboard().then((leaderboard) => {
+          // console.log("Sending leaderboard", leaderboard);
+          socket.emit("leaderboard", leaderboard);
+        });
+      });
     delete game1.players[socket.id];
     socket.broadcast.emit("playerDeath", id);
-
-    io.emit("leaderboard", leaderboard.slice(0, 10));
-    // getLeaderboard.then(() => {
-    //   io.emit("leaderboard", leaderboard);
-    // });
   });
 });
 
-// app.get("/", (req, res) => {
-//   res.send("Server is working!");
-// });
-
 server.listen(port, () => {
   console.log(`Server is listening on port ${port}.`);
-  getLeaderboard();
 });
 
 function addScore(name, score) {
   console.log("\x1b[32m%s\x1b[0m", `[LEADERBOARD]: ${name} - ${score}`);
 
-  leaderboard.push({ name: name, score: score });
-  leaderboard = leaderboard.sort(
-    (player1, player2) => player2.score - player1.score
-  );
-
-  fs.writeFileSync("leaderboard.json", JSON.stringify(leaderboard));
+  return datastore.save({
+    key: datastore.key("leaderboard"),
+    data: { name: name, score: score },
+  });
 }
 
 async function getLeaderboard() {
-  if (!fs.existsSync("leaderboard.json")) {
-    try {
-      fs.writeFileSync("leaderboard.json", "[]");
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  leaderboard = JSON.parse(fs.readFileSync("leaderboard.json"));
-  leaderboard = leaderboard.sort(
-    (player1, player2) => player2.score - player1.score
-  );
+  const query = datastore
+    .createQuery("leaderboard")
+    .order("score", { descending: true })
+    .limit(10);
+  let [leaderboard] = await datastore.runQuery(query);
+  leaderboard = leaderboard.map((entity) => {
+    return { name: entity.name, score: entity.score };
+  });
+  return leaderboard;
 }

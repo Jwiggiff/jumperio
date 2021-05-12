@@ -14,6 +14,7 @@ export function connect(address) {
   });
 
   socket.on("leaderboard", (leaderboard) => {
+    // console.log("leaderboard recieved", leaderboard);
     document.querySelector(".leaderboard-list").innerHTML = "";
     leaderboard.forEach((player) => {
       let li = document.createElement("li");
