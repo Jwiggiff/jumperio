@@ -136,7 +136,7 @@ function updateScores() {
 function updateCookie() {
   let high_score = readCookie("high_score");
   let expiry = new Date();
-  expiry.setHours(23, 59, 59);
+  expiry.setUTCHours(23, 59, 59);
   document.cookie = `last_score=${
     players[myID].score
   };expires=${expiry.toUTCString()};`;
