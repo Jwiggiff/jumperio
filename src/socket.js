@@ -11,6 +11,10 @@ export function connect(address) {
 
   socket.on("seed", (seed) => {
     seedRandom(seed);
+
+    document.getElementById("day").innerText = Math.floor(
+      (seed - 1642741200000) / (24 * 60 * 60 * 1000)
+    );
   });
 
   socket.on("leaderboard", (leaderboard) => {

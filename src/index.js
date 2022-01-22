@@ -36,3 +36,26 @@ window.addEventListener("keyup", (e) => {
   )
     document.getElementById("startBtn").click();
 });
+window.addEventListener("touchstart", ({ changedTouches }) =>
+  changedTouches[0].clientX > window.innerWidth / 2
+    ? (window.key = "ArrowRight")
+    : (window.key = "ArrowLeft")
+);
+window.addEventListener("touchend", ({ changedTouches }) => {
+  let key =
+    changedTouches[0].clientX > window.innerWidth / 2
+      ? "ArrowRight"
+      : "ArrowLeft";
+  if (key == window.key) window.key = "";
+});
+document.querySelector(".info-btn").addEventListener("click", () => {
+  document.querySelector(".info-screen").classList.toggle("visible");
+});
+document
+  .querySelector(".info-screen > .close")
+  .addEventListener("click", () => {
+    document.querySelector(".info-screen").classList.remove("visible");
+  });
+window.addEventListener("load", () => {
+  document.querySelector(".info-screen").classList.add("visible");
+});
