@@ -14,6 +14,7 @@ let game1 = {
   id: "",
   state: "",
   seed: "testSeed", //TODO: new seed every day
+  expiry: new Date(2022, 0, 21),
   players: {
     /* socket.id: {
       id: <playerID>,
@@ -32,6 +33,7 @@ app.get("/server-status", (req, res) => {
   ID: ${game1.id}<br>
   State: ${game1.state}<br>
   Seed: ${game1.seed}<br>
+  Expiry: ${game1.expiry}<br>
   <table>
   <tr>
   <th>Socket ID</th>
@@ -55,6 +57,14 @@ app.get("/server-status", (req, res) => {
 
 io.on("connection", (socket) => {
   // console.log(`A user just connected with id ${socket.id}.`);
+
+  // Check if new day
+  let now = new Date();
+  if (now > game1.expiry) {
+    // Seed expired
+    game1.seed = now.setHours(0, 0, 0);
+    game1.expiry = new Date(now.setHours(24));
+  }
 
   socket.emit("seed", game1.seed);
   getLeaderboard().then((leaderboard) =>
