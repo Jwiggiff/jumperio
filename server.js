@@ -64,6 +64,7 @@ io.on("connection", (socket) => {
     // Seed expired
     game1.seed = now.setHours(0, 0, 0);
     game1.expiry = new Date(now.setHours(24));
+    clearLeaderboard();
   }
 
   socket.emit("seed", game1.seed);
@@ -148,4 +149,18 @@ async function getLeaderboard() {
     return { name: entity.name, score: entity.score };
   });
   return leaderboard;
+}
+
+function clearLeaderboard() {
+  const query = datastore.createQuery("leaderboard");
+  datastore
+    .runQuery(query)
+    .then(([leaderboard]) => {
+      leaderboard.forEach((entity) => {
+        datastore.delete(entity[datastore.KEY]);
+      });
+    })
+    .catch((e) => {
+      console.error(e);
+    });
 }

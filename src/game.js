@@ -135,9 +135,15 @@ function updateScores() {
 
 function updateCookie() {
   let high_score = readCookie("high_score");
-  document.cookie = `last_score=${players[myID].score};`;
+  let expiry = new Date();
+  expiry.setHours(23, 59, 59);
+  document.cookie = `last_score=${
+    players[myID].score
+  };expires=${expiry.toUTCString()};`;
   if (players[myID].score > high_score)
-    document.cookie = `high_score=${players[myID].score};`;
+    document.cookie = `high_score=${
+      players[myID].score
+    };expires=${expiry.toUTCString()};`;
 }
 
 function readCookie(property) {
