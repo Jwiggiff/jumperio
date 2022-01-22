@@ -13,7 +13,7 @@ export function connect(address) {
     seedRandom(seed);
 
     document.getElementById("day").innerText = Math.floor(
-      (seed - 1642741200000) / (24 * 60 * 60 * 1000)
+      (seed - 1642723200000) / (24 * 60 * 60 * 1000)
     );
   });
 
