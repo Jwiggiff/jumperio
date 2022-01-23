@@ -62,6 +62,7 @@ io.on("connection", (socket) => {
   let now = new Date();
   if (now > game1.expiry) {
     // Seed expired
+    console.log("resetting seed and leaderboard...");
     game1.seed = now.setHours(0, 0, 0);
     game1.expiry = new Date(now.setHours(24));
     clearLeaderboard();
