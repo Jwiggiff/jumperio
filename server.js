@@ -3,17 +3,29 @@ const http = require("http");
 const socket = require("socket.io");
 const { Datastore } = require("@google-cloud/datastore");
 
+require("dotenv").config();
+
 const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 
-const datastore = new Datastore();
+const creds = JSON.parse(
+  Buffer.from(process.env.GOOGLE_CREDENTIALS, "base64").toString()
+);
+
+const datastore = new Datastore({
+  projectId: creds.project_id,
+  credentials: {
+    client_email: creds.client_email,
+    private_key: creds.private_key,
+  },
+});
 
 let game1 = {
   id: "",
   state: "",
-  seed: "testSeed", //TODO: new seed every day
+  seed: "testSeed",
   expiry: new Date(2022, 0, 21),
   players: {
     /* socket.id: {
@@ -58,17 +70,23 @@ app.get("/server-status", (req, res) => {
 io.on("connection", (socket) => {
   // console.log(`A user just connected with id ${socket.id}.`);
 
-  // Check if new day
-  let now = new Date();
-  if (now > game1.expiry) {
-    // Seed expired
-    console.log("resetting seed and leaderboard...");
-    game1.seed = now.setHours(0, 0, 0);
-    game1.expiry = new Date(now.setHours(24));
-    clearLeaderboard();
-  }
+  getSeed().then((seed) => {
+    let now = new Date();
 
-  socket.emit("seed", game1.seed);
+    // Check if new day
+    if (seed == undefined || now > seed.expiry) {
+      // Seed expired
+      console.log("resetting seed and leaderboard...");
+      seed = seed ?? {};
+      seed.seed = now.setHours(0, 0, 0);
+      seed.expiry = new Date(now.setHours(24));
+      console.log(seed);
+      setSeed(seed.seed, seed.expiry);
+      clearLeaderboard();
+    }
+    socket.emit("seed", seed.seed);
+  });
+
   getLeaderboard().then((leaderboard) =>
     socket.emit("leaderboard", leaderboard)
   );
@@ -164,4 +182,20 @@ function clearLeaderboard() {
     .catch((e) => {
       console.error(e);
     });
+}
+
+async function getSeed() {
+  const query = datastore
+    .createQuery("seed")
+    .order("seed", { descending: true })
+    .limit(1);
+  let [seed] = await datastore.runQuery(query);
+  return seed[0];
+}
+
+function setSeed(seed, expiry) {
+  return datastore.save({
+    key: datastore.key("seed"),
+    data: { seed: seed, expiry: expiry.toUTCString() },
+  });
 }
