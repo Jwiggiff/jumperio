@@ -78,8 +78,8 @@ io.on("connection", (socket) => {
       // Seed expired
       console.log("resetting seed and leaderboard...");
       seed = seed ?? {};
-      seed.seed = now.setHours(0, 0, 0);
-      seed.expiry = new Date(now.setHours(24));
+      seed.seed = now.setUTCHours(0, 0, 0);
+      seed.expiry = new Date(now.setUTCHours(24));
       console.log(seed);
       setSeed(seed.seed, seed.expiry);
       clearLeaderboard();
