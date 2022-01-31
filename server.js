@@ -70,23 +70,27 @@ app.get("/server-status", (req, res) => {
 io.on("connection", (socket) => {
   // console.log(`A user just connected with id ${socket.id}.`);
 
-  getSeed().then((seed) => {
-    let now = new Date();
+  getSeed()
+    .then((seed) => {
+      let now = new Date();
 
-    console.log("Checking: ", now, seed.expiry);
-    // Check if new day
-    if (seed == undefined || now > seed.expiry) {
-      // Seed expired
-      console.log("resetting seed and leaderboard...");
-      seed = seed ?? {};
-      seed.seed = now.setUTCHours(0, 0, 0);
-      seed.expiry = new Date(now.setUTCHours(24));
-      console.log(seed);
-      setSeed(seed.seed, seed.expiry);
-      clearLeaderboard();
-    }
-    socket.emit("seed", seed.seed);
-  });
+      console.log("Checking: ", now, seed.expiry);
+      // Check if new day
+      if (seed == undefined || now > seed.expiry) {
+        // Seed expired
+        console.log("resetting seed and leaderboard...");
+        seed = seed ?? {};
+        seed.seed = now.setUTCHours(0, 0, 0);
+        seed.expiry = new Date(now.setUTCHours(24));
+        console.log(seed);
+        setSeed(seed.seed, seed.expiry);
+        clearLeaderboard();
+      }
+      socket.emit("seed", seed.seed);
+    })
+    .catch((e) => {
+      console.error("Seed Error: ", e);
+    });
 
   getLeaderboard().then((leaderboard) =>
     socket.emit("leaderboard", leaderboard)
