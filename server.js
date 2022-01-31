@@ -73,6 +73,7 @@ io.on("connection", (socket) => {
   getSeed().then((seed) => {
     let now = new Date();
 
+    console.log("Checking: ", now, seed.expiry);
     // Check if new day
     if (seed == undefined || now > seed.expiry) {
       // Seed expired
